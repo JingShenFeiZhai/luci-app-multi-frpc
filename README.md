@@ -1,35 +1,66 @@
 # LUCI-APP-MULTI-FRPC
 
-> 这是我第一次开发Openwrt插件，也是我开源的第三个项目，可能会有些Bug，欢迎ISSUE！
+一款 OpenWrt / LuCI 的 frpc 客户端插件，支持同时连接多台 frps 服务器。
 
-一款支持多服务端的frp Client Openwrt插件，修改自Lean源码
+本项目 fork 自 [justice2001/luci-app-multi-frpc](https://github.com/justice2001/luci-app-multi-frpc)：在其 1.0.1 基础上修复了安装冲突、LuCI 崩溃等问题，并新增按服务器分配服务等能力。上游基于 [luci-app-frpc](https://github.com/coolsnowwolf/luci/tree/master/applications/luci-app-frpc) 修改。
 
-## ✨ 特性
+## 特性
 
-* 支持多个服务器同时连接
-* 支持显示多个服务器的连接日志
-* 拆分插件日志
+- 一条 frpc 同时连接多台 frps，每台服务器独立进程、独立客户端日志
+- 服务可指定只发布到部分服务器（v1.0.3+）
+- 与固件自带的 `luci-app-frpc` 使用独立命名空间，可同时安装
+- 支持 HTTP / HTTPS / TCP / UDP / STCP / XTCP 及常用 plugin
 
-## 🖊️ 使用
+## 命名空间
 
-您可以在下列地址下载到ipk文件：
+| 项目 | luci-app-frpc | luci-app-multi-frpc |
+| --- | --- | --- |
+| 配置 | `/etc/config/frp` | `/etc/config/multi-frpc` |
+| 启动脚本 | `/etc/init.d/frp` | `/etc/init.d/multi-frpc` |
+| 菜单 | 服务 → Frp | 服务 → Multi Frpc |
+| 运行目录 | `/var/etc/frp` | `/var/etc/multi-frpc` |
 
-* [GitHub Releases](https://github.com/justice2001/luci-app-multi-frpc/releases)
-* Gitee Releases - 等待...
+首次安装时若检测到 `/etc/config/frp`，会自动迁移到 `/etc/config/multi-frpc` 并保持总开关关闭。确认新插件正常后，可卸载 `luci-app-frpc`、`luci-i18n-frpc-zh-cn`。
 
-您可以使用Openwrt的包管理器的`上传软件包`进行安装，或者将ipk文件上传至openwrt使用`opkg install <package>`安装。
+## 安装
 
-## ℹ️ 信息
+iStore「手动安装」依次上传主包和可选语言包；或：
 
-项目开发的需求会同步到[Gitea](https://git.mczhengyi.top/zhengyi/luci-app-multi-frpc/issues)，包括我自己提的一些事项都会在这里展示，您可以浏览这里来获取开发动向。
+```sh
+opkg install luci-app-multi-frpc_<版本>_all.ipk
+opkg install luci-i18n-multi-frpc-zh-cn_<版本>_all.ipk   # 可选
+```
 
-## 🎉 鸣谢
+升级时提示 `resolve_conffiles ... /etc/config/multi-frpc-opkg` 属正常（保留现有配置），删除该 `-opkg` 文件即可。安装完成后刷新 LuCI。
 
-- 该项目基于[luci-app-frpc](https://github.com/coolsnowwolf/luci/tree/master/applications/luci-app-frpc)修改
-- 部分代码参考自[luci-app-adguardhome](https://github.com/rufengsuixing/luci-app-adguardhome)
+## 使用
 
-## 🧑‍💻 碎碎念（开发历程和原因）
+1. 「服务器列表」添加 frps：备注名、地址、`bind_port`、token，勾选启用。
+2. 「服务列表」添加要转发的服务：备注名（唯一）、协议类型、本地地址/端口；TCP/UDP 填远程端口，HTTP/HTTPS 填域名，STCP/XTCP 填角色与密钥。
+3. 需要时在服务里勾选「目标服务器」，只发布到指定 frps；不勾选表示所有已启用服务器。
+4. 「基本设置」勾选启用，点「保存并应用」。
 
-> 这段只是介绍我的开发原因与经历，可能比较长
+visitor 需要不同本地监听地址时，为每台服务器各建一条服务，分别设置本地地址/端口并只勾选对应服务器。
 
-我的个人一些服务和网站都是运行在一个内网的服务器中的，由于家用宽带并不允许运行一些应用，因此我采用的是内网穿透的方案来运行对外服务，而我还有一个VPN来访问家中的网路，碍于国内运营商的贷款费用巨贵，因此我选择了Vultr作为中转，虽然延迟很高，但对于在公网看个电影之类的应用也够用，无非就是连接建立比较慢，一旦播放起来就完全没有感受了。既然服务器都买了，带宽也还有很大的富裕，我就想着搭一个frp服务器节点吧，使用DNS把国外的流量导入到这个服务器上。现在我有两个frp服务端，但是Openwrt的插件却只支持单个服务端，找遍了GitHub也没有找到支持多个服务端的frp插件（可能我这种要求比较奇葩吧）。于是，做为一个开发者，我决定自己动手，丰衣足食。开发一款支持多个服务端同时映射的插件，但这是我第一次摸Openwrt的插件开发。网上的文档似乎也不算多，从零开始开发好像也不现实，因此我找出了Lean的luci-app-frpc的源码，分析使用的API，查找API文档，同时也从luci-app-adguardhome中学习到了一些知识。最终搓出了这个插件。
+## 构建
+
+```sh
+# OpenWrt SDK / 源码树
+make package/luci-app-multi-frpc/compile V=s
+
+# 无 SDK，直接生成 ipk（输出到 dist/）
+python3 tools/build-ipk.py
+```
+
+## 说明
+
+- 日志：`/var/etc/multi-frpc/frp.log`（插件），`/var/etc/multi-frpc/frpc-<服务器名>.log`（客户端）。
+- `tcp_mux` 必须与 frps 一致，否则登录失败。
+- 从 1.0.1 升级前请备份 `/etc/config/frp`（旧版本未将其标记为 conffiles）。
+- 服务备注名会作为 frpc 配置的段名，必须唯一；删除或重建服务器后请重新确认「目标服务器」。
+
+## 鸣谢
+
+- [justice2001/luci-app-multi-frpc](https://github.com/justice2001/luci-app-multi-frpc)：本项目的上游
+- [luci-app-frpc](https://github.com/coolsnowwolf/luci/tree/master/applications/luci-app-frpc)：最初的 LuCI 实现
+- [luci-app-adguardhome](https://github.com/rufengsuixing/luci-app-adguardhome)：部分代码参考

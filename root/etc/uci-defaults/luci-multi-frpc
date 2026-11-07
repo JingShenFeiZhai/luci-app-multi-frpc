@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# 本插件使用独立的命名空间（multi-frpc）：独立配置、独立 init 脚本、
+# 独立日志目录，因此可以和固件自带的 luci-app-frpc 同时安装、互不覆盖。
+#
+# 如果设备上已有 luci-app-frpc 的配置，且本插件的配置还是安装时的默认值，
+# 就把旧配置复制过来，方便直接沿用已有的服务端/服务列表设置。
+# 复制后默认关闭总开关，避免与仍在运行的 luci-app-frpc 重复建立隧道。
+
+DEFAULT_CONF="/usr/share/multi-frpc/multi-frpc.config"
+
+if [ -s /etc/config/frp ] && [ -s /etc/config/multi-frpc ] && \
+   [ -f "$DEFAULT_CONF" ] && cmp -s /etc/config/multi-frpc "$DEFAULT_CONF"; then
+	cp /etc/config/frp /etc/config/multi-frpc
+	uci -q set multi-frpc.common.enabled='0'
+	uci -q commit multi-frpc
+fi
+
+uci -q batch <<-EOF >/dev/null
+	delete ucitrack.@multi-frpc[-1]
+	add ucitrack multi-frpc
+	set ucitrack.@multi-frpc[-1].init='multi-frpc'
+	commit ucitrack
+EOF
+
+# 注册开机启动（是否真正启动仍由 /etc/config/multi-frpc 的总开关决定）
+[ -x /etc/init.d/multi-frpc ] && /etc/init.d/multi-frpc enable
+
+rm -f /tmp/luci-indexcache
+exit 0

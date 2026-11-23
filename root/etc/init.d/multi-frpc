@@ -80,67 +80,67 @@ conf_proxy_add() {
 
 	[ -n "$remark" ] && [ -n "$type" ] || return 1
 	
-	echo "" >>$tmpconf
-	echo "[$remark]" >>$tmpconf
-	echo "type=$type" >>$tmpconf
-	[ -n "$custom_domains" ] && echo "custom_domains=$custom_domains" >>$tmpconf
-	[ -n "$subdomain" ] && echo "subdomain=$subdomain" >>$tmpconf
-	[ -n "$remote_port" ] && echo "remote_port=$remote_port" >>$tmpconf
-	[ -z "$stcp_role" ] && [ -z "$xtcp_role" ] && [ -n "$local_ip" ] && echo "local_ip=$local_ip" >>$tmpconf
-	[ -z "$stcp_role" ] && [ -z "$xtcp_role" ] && [ -n "$local_port" ] && echo "local_port=$local_port" >>$tmpconf
-	[ -n "$locations" ] && echo "locations=$locations" >>$tmpconf
+	echo "" >>"$tmpconf"
+	echo "[$remark]" >>"$tmpconf"
+	echo "type=$type" >>"$tmpconf"
+	[ -n "$custom_domains" ] && echo "custom_domains=$custom_domains" >>"$tmpconf"
+	[ -n "$subdomain" ] && echo "subdomain=$subdomain" >>"$tmpconf"
+	[ -n "$remote_port" ] && echo "remote_port=$remote_port" >>"$tmpconf"
+	[ -z "$stcp_role" ] && [ -z "$xtcp_role" ] && [ -n "$local_ip" ] && echo "local_ip=$local_ip" >>"$tmpconf"
+	[ -z "$stcp_role" ] && [ -z "$xtcp_role" ] && [ -n "$local_port" ] && echo "local_port=$local_port" >>"$tmpconf"
+	[ -n "$locations" ] && echo "locations=$locations" >>"$tmpconf"
 	[ -n "$http_user" -a -n "$http_pwd" ] && {
-		echo "http_user=$http_user" >>$tmpconf
-		echo "http_pwd=$http_pwd" >>$tmpconf
+		echo "http_user=$http_user" >>"$tmpconf"
+		echo "http_pwd=$http_pwd" >>"$tmpconf"
 	}
-	[ -n "$host_header_rewrite" ] && echo "host_header_rewrite=$host_header_rewrite" >>$tmpconf
-	[ -n "$plugin" ] && echo "plugin=$plugin" >>$tmpconf
+	[ -n "$host_header_rewrite" ] && echo "host_header_rewrite=$host_header_rewrite" >>"$tmpconf"
+	[ -n "$plugin" ] && echo "plugin=$plugin" >>"$tmpconf"
 	[ -n "$plugin_http_user" -a -n "$plugin_http_passwd" ] && {
-		echo "plugin_http_user=$plugin_http_user" >>$tmpconf
-		echo "plugin_http_passwd=$plugin_http_passwd" >>$tmpconf
+		echo "plugin_http_user=$plugin_http_user" >>"$tmpconf"
+		echo "plugin_http_passwd=$plugin_http_passwd" >>"$tmpconf"
 	}
-	[ -n "$plugin_unix_path" ] && echo "plugin_unix_path=$plugin_unix_path" >>$tmpconf
+	[ -n "$plugin_unix_path" ] && echo "plugin_unix_path=$plugin_unix_path" >>"$tmpconf"
 	
 	[ -n "$stcp_role" ] && {
 		if [ "$stcp_role" == "visitor" ]; then
-			echo "role=$stcp_role" >>$tmpconf
-			[ -n "$local_ip" ] && echo "bind_addr=$local_ip" >>$tmpconf
-			[ -n "$local_port" ] && echo "bind_port=$local_port" >>$tmpconf
-			[ -n "$stcp_servername" ] && echo "server_name=$stcp_servername" >>$tmpconf || return 1
+			echo "role=$stcp_role" >>"$tmpconf"
+			[ -n "$local_ip" ] && echo "bind_addr=$local_ip" >>"$tmpconf"
+			[ -n "$local_port" ] && echo "bind_port=$local_port" >>"$tmpconf"
+			[ -n "$stcp_servername" ] && echo "server_name=$stcp_servername" >>"$tmpconf" || return 1
 		else
-			[ -n "$local_ip" ] && echo "local_ip=$local_ip" >>$tmpconf
-			[ -n "$local_port" ] && echo "local_port=$local_port" >>$tmpconf
+			[ -n "$local_ip" ] && echo "local_ip=$local_ip" >>"$tmpconf"
+			[ -n "$local_port" ] && echo "local_port=$local_port" >>"$tmpconf"
 		fi
-		[ -n "$stcp_secretkey" ] && echo "sk=$stcp_secretkey" >>$tmpconf || return 1
+		[ -n "$stcp_secretkey" ] && echo "sk=$stcp_secretkey" >>"$tmpconf" || return 1
 	}
 	
 	[ -n "$xtcp_role" ] && {
 		if [ "$xtcp_role" == "visitor" ]; then
-			echo "role=$xtcp_role" >>$tmpconf
-			[ -n "$local_ip" ] && echo "bind_addr=$local_ip" >>$tmpconf
-			[ -n "$local_port" ] && echo "bind_port=$local_port" >>$tmpconf
-			[ -n "$xtcp_servername" ] && echo "server_name=$xtcp_servername" >>$tmpconf || return 1
+			echo "role=$xtcp_role" >>"$tmpconf"
+			[ -n "$local_ip" ] && echo "bind_addr=$local_ip" >>"$tmpconf"
+			[ -n "$local_port" ] && echo "bind_port=$local_port" >>"$tmpconf"
+			[ -n "$xtcp_servername" ] && echo "server_name=$xtcp_servername" >>"$tmpconf" || return 1
 		else
-			[ -n "$local_ip" ] && echo "local_ip=$local_ip" >>$tmpconf
-			[ -n "$local_port" ] && echo "local_port=$local_port" >>$tmpconf
+			[ -n "$local_ip" ] && echo "local_ip=$local_ip" >>"$tmpconf"
+			[ -n "$local_port" ] && echo "local_port=$local_port" >>"$tmpconf"
 		fi
-		[ -n "$xtcp_secretkey" ] && echo "sk=$xtcp_secretkey" >>$tmpconf || return 1
+		[ -n "$xtcp_secretkey" ] && echo "sk=$xtcp_secretkey" >>"$tmpconf" || return 1
 	}
 	
 	[ -n "$proxy_protocol_version" ] && {
 		if [ "$proxy_protocol_version" != "disable" ]; then
-			echo "proxy_protocol_version=$proxy_protocol_version" >>$tmpconf
+			echo "proxy_protocol_version=$proxy_protocol_version" >>"$tmpconf"
 		fi
 	}
 
-	[ -n "$https_plugin" ] && echo "plugin=$https_plugin" >>$tmpconf
-	[ -n "$plugin_local_addr" ] && echo "plugin_local_addr=$plugin_local_addr" >>$tmpconf
+	[ -n "$https_plugin" ] && echo "plugin=$https_plugin" >>"$tmpconf"
+	[ -n "$plugin_local_addr" ] && echo "plugin_local_addr=$plugin_local_addr" >>"$tmpconf"
 	[ -n "$plugin_crt_path" -a -n "$plugin_key_path" ] && {
-		echo "plugin_crt_path=$plugin_crt_path" >>$tmpconf
-		echo "plugin_key_path=$plugin_key_path" >>$tmpconf
+		echo "plugin_crt_path=$plugin_crt_path" >>"$tmpconf"
+		echo "plugin_key_path=$plugin_key_path" >>"$tmpconf"
 	}
-	[ -n "$plugin_host_header_rewrite" ] && echo "plugin_host_header_rewrite=$plugin_host_header_rewrite" >>$tmpconf
-	[ -n "$plugin_header_X_From_Where" ] && echo "plugin_header_X_From_Where=$plugin_header_X_From_Where" >>$tmpconf	
+	[ -n "$plugin_host_header_rewrite" ] && echo "plugin_host_header_rewrite=$plugin_host_header_rewrite" >>"$tmpconf"
+	[ -n "$plugin_header_X_From_Where" ] && echo "plugin_header_X_From_Where=$plugin_header_X_From_Where" >>"$tmpconf"	
 
 	frp_write_bool use_encryption $cfg 1 "$tmpconf"
 	frp_write_bool use_compression $cfg 1 "$tmpconf"
@@ -150,12 +150,12 @@ conf_proxy_add() {
 config_server_add() {
 	local cfg="$1"
 	local servicecfg="$3"
-	local server_addr server_port token user server_name enabled
+	local server_addr server_port token server_name enabled
 
 	config_get server_name "$cfg" name
 	config_get_bool enabled "$cfg" enabled 0
 
-	[ $server_name != "" ] || return 1
+	[ -n "$server_name" ] || return 1
 	if [ "$enabled" -lt 1 ]; then
 		echo_date "服务端 $server_name 被禁用"
 		return 1
@@ -165,19 +165,27 @@ config_server_add() {
 	config_get server_addr "$cfg" server_addr
 	config_get server_port "$cfg" server_port
 	config_get token "$cfg" token
-	config_get user "$cfg" user
 
 	local tmpconf="$2/frpc-$server_name.conf"
 
-	echo "[common]" >$tmpconf
-	echo "server_addr=${server_addr}" >>$tmpconf
-	echo "server_port=${server_port}" >>$tmpconf
-	echo "token=${token}" >>$tmpconf
-	[ -n "$user" ] && echo "user=$user" >>$tmpconf
-	echo "log_file=$LOGFILE/frpc-$server_name.log" >>$tmpconf
+	echo "[common]" >"$tmpconf"
+	echo "server_addr=${server_addr}" >>"$tmpconf"
+	echo "server_port=${server_port}" >>"$tmpconf"
+	echo "token=${token}" >>"$tmpconf"
+	echo "log_file=$LOGFILE/frpc-$server_name.log" >>"$tmpconf"
+
+	# 多个 frpc 实例的 admin 端口必须错开，否则第二个实例会因端口占用启动失败
+	MULTI_FRPC_INDEX=$((MULTI_FRPC_INDEX + 1))
+	local admin_offset=$((MULTI_FRPC_INDEX - 1))
+	if [ "$admin_enable" = "1" ] && [ -n "$admin_port" ]; then
+		echo "admin_addr=0.0.0.0" >>"$tmpconf"
+		echo "admin_port=$((admin_port + admin_offset))" >>"$tmpconf"
+		[ -n "$admin_user" ] && echo "admin_user=$admin_user" >>"$tmpconf"
+		[ -n "$admin_pwd" ] && echo "admin_pwd=$admin_pwd" >>"$tmpconf"
+	fi
 
 	# Append global common options first
-	cat "$servicecfg" >> $tmpconf
+	cat "$servicecfg" >> "$tmpconf"
 
 	# Append only the services that target this server
 	config_foreach conf_proxy_add proxy "$tmpconf" "$cfg"
@@ -236,8 +244,8 @@ boot() {
 
 start() {
 	config_load "multi-frpc"
-	local enabled server_addr server_port time privilege_token user tcp_mux enable_cpool tls_enable
-	local pool_count log_level log_max_days login_fail_exit http_proxy protocol admin_port admin_user admin_pwd
+	local enabled server_addr server_port time privilege_token tcp_mux enable_cpool tls_enable
+	local pool_count log_level log_max_days login_fail_exit http_proxy protocol admin_enable admin_port admin_user admin_pwd
 	local tls_cert_file tls_key_file tls_trusted_ca_file
 
 	config_get_bool enabled common enabled 1
@@ -251,6 +259,7 @@ start() {
 	config_get http_proxy common http_proxy
 	config_get protocol common protocol
 	config_get time common time
+	config_get_bool admin_enable common admin_enable 0
 	config_get admin_port common admin_port
 	config_get admin_user common admin_user
 	config_get admin_pwd common admin_pwd
@@ -278,9 +287,6 @@ start() {
 	echo "protocol=${protocol}" >>$service_conf
 	[ -n "$http_proxy" ] && echo "http_proxy=$http_proxy" >>$service_conf
 	[ -n "$pool_count" ] && echo "pool_count=$pool_count" >>$service_conf
-	[ -n "$admin_port" ] && echo "admin_addr=0.0.0.0" >>$service_conf && echo "admin_port=$admin_port" >>$service_conf
-	[ -n "$admin_user" ] && echo "admin_user=$admin_user" >>$service_conf
-	[ -n "$admin_pwd" ] && echo "admin_pwd=$admin_pwd" >>$service_conf
 	[[ -n "$tls_cert_file" && -n "$tls_key_file" ]] && echo "tls_cert_file=$tls_cert_file" >>$service_conf && echo "tls_key_file=$tls_key_file" >>$service_conf
 	[ -n "$tls_trusted_ca_file" ] && echo "tls_trusted_ca_file=$tls_trusted_ca_file" >>$service_conf
 
@@ -290,6 +296,7 @@ start() {
 	frp_write_bool login_fail_exit common 1
 
 	# Write Service Config
+	MULTI_FRPC_INDEX=0
 	config_foreach config_server_add server "$tmpconf" "$service_conf"
 
 	# 检查服务
@@ -312,16 +319,23 @@ start_service() {
 
 	config_get server_name "$config" name
 
-    [ "$server_name" != "" ] || return 1
-	[ -f "$2/frpc-$server_name.conf" ] || return 1
+    [ -n "$server_name" ] || return 1
+	local conf="$2/frpc-$server_name.conf"
+	if [ ! -f "$conf" ]; then
+		echo_date "服务器 $server_name 的配置文件不存在，跳过启动"
+		return 1
+	fi
 	# 没有任何目标服务时不必启动该服务器的 frpc
-	grep -q '^type=' "$2/frpc-$server_name.conf" || return 1
+	if ! grep -q '^type=' "$conf"; then
+		echo_date "服务器 $server_name 没有可发布的服务，跳过启动（请检查服务列表的“目标服务器”）"
+		return 1
+	fi
 
 	logger -t FRPC "Starting frp service $server_name"
 	echo_date "正在启动Frp客户端: $server_name"
 
 	SERVICE_DAEMONIZE=1 \
-		"/usr/bin/frpc" -c "$2/frpc-$server_name.conf" &
+		"/usr/bin/frpc" -c "$conf" &
 }
 
 stop() {

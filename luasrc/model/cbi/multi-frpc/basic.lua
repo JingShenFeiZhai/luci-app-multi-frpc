@@ -165,9 +165,6 @@ e.width = "30%"
 e = t:option(DummyValue, "server_port", translate("Server Port"))
 e.width = "15%"
 
-e = t:option(DummyValue, "user", translate("Server User"))
-e.width = "15%"
-
 e = t:option(Flag, "enabled", translate("Enable State"))
 e.width = "10%"
 e.rmempty = false

@@ -41,10 +41,4 @@ e.optional = false
 e.password = true
 e.rmempty = false
 
-e = t:taboption("base", Value, "user", translate("User"))
-e.description = translate("Commonly used to distinguish you with other clients.")
-e.optional = true
-e.default = ""
-e.rmempty = false
-
 return a

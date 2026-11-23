@@ -42,6 +42,61 @@ opkg install luci-i18n-multi-frpc-zh-cn_<版本>_all.ipk   # 可选
 
 visitor 需要不同本地监听地址时，为每台服务器各建一条服务，分别设置本地地址/端口并只勾选对应服务器。
 
+## 多实例、配置文件与状态
+
+每个启用的服务器都会生成一份独立配置，并启动一个独立的 frpc 进程：
+
+| 内容 | 位置 |
+| --- | --- |
+| UCI 源配置 | `/etc/config/multi-frpc` |
+| 运行目录（每次启动重建） | `/var/etc/multi-frpc/` |
+| 每台服务器的配置 | `/var/etc/multi-frpc/frpc-<服务器备注名>.conf` |
+| 每台服务器的日志 | `/var/etc/multi-frpc/frpc-<服务器备注名>.log` |
+| 插件日志 | `/var/etc/multi-frpc/frp.log` |
+
+新增第二个实例：在「服务器列表」添加第二条（名称唯一、地址/端口/token 填好、勾选启用），保存并应用即可；不需要手动复制配置或启动进程。
+
+配置文件格式（自动生成，不要直接改）：
+
+```ini
+[common]
+server_addr = 1.2.3.4
+server_port = 7000
+token = your_token
+log_file = /var/etc/multi-frpc/frpc-A.log
+
+[web]
+type = tcp
+local_ip = 127.0.0.1
+local_port = 80
+remote_port = 8080
+```
+
+检查运行状态：
+
+```sh
+pgrep -af 'frpc -c /var/etc/multi-frpc'
+ls -l /var/etc/multi-frpc/
+tail -n 50 /var/etc/multi-frpc/frp.log
+tail -n 50 '/var/etc/multi-frpc/frpc-<服务器名>.log'
+```
+
+LuCI 页面顶部会显示 RUNNING / NOT RUNNING；「客户端日志」页面可以切换服务器查看各自的日志。
+
+第二个服务器连不上时，按顺序检查：
+
+1. 该服务器是否勾选「启用」、名称是否非空（名称可以包含空格）；
+2. 「服务列表 → 目标服务器」是否把它排除了；
+3. `frpc-<服务器名>.log` 里是否有 token、`tcp_mux`、连接超时等错误；
+4. 地址、端口、token 是否与 frps 一致，frps 防火墙是否放行；
+5. 多实例的 `admin_port` 会自动错开（7400、7401…），不需要手动改。
+
+## Proxy 名称与访问控制
+
+- proxy 名称就是「服务备注名」，不会拼接服务器名，也不会加 `user.` 前缀；STCP/XTCP 的 visitor 填同一个名称即可。
+- 生成的 proxy / visitor 配置中没有任何白名单或黑名单字段；STCP/XTCP 只靠 `sk` 做访问控制，两端必须一致。
+- 服务器配置不再写入 `user`，因此 frp 不会把名称改成 `{user}.{proxyName}`；旧配置里的“用户”值会被忽略。
+
 ## 构建
 
 ```sh
@@ -57,6 +112,7 @@ python3 tools/build-ipk.py
 - 日志：`/var/etc/multi-frpc/frp.log`（插件），`/var/etc/multi-frpc/frpc-<服务器名>.log`（客户端）。
 - `tcp_mux` 必须与 frps 一致，否则登录失败。
 - 从 1.0.1 升级前请备份 `/etc/config/frp`（旧版本未将其标记为 conffiles）。
+- 升级到 1.0.4 后 proxy 名称会从 `<user>.<备注名>` 变为 `<备注名>`；若 frps 上旧名称尚未过期，重启 frps 或等待旧连接断开即可。
 - 服务备注名会作为 frpc 配置的段名，必须唯一；删除或重建服务器后请重新确认「目标服务器」。
 
 ## 鸣谢

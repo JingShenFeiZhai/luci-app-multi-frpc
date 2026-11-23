@@ -11,7 +11,7 @@ LUCI_DEPENDS:=+wget +frpc
 LUCI_PKGARCH:=all
 
 PKG_NAME:=luci-app-multi-frpc
-PKG_VERSION:=1.0.3
+PKG_VERSION:=1.0.5
 PKG_RELEASE:=1
 PKG_LICENSE:=Apache-2.0
 
